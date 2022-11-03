@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.66"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "216261ddc8289130e551ddcd5ce8a064710c0d064a4d2895c67151c92b5443f6"
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -714,20 +720,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "498a099351efa4becc6a19c72aa9270598e8fd274ca47052e37455241c88b696"
 
 [[package]]
-name = "pcdownload"
-version = "0.0.1"
-dependencies = [
- "clap",
- "indicatif",
- "reqwest",
- "serde",
- "serde_json",
- "stac",
- "tokio",
- "url",
-]
-
-[[package]]
 name = "percent-encoding"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -750,6 +742,22 @@ name = "pkg-config"
 version = "0.3.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ac9a59f73473f1b8d852421e59e64809f025994837ef743615c6d0c5b305160"
+
+[[package]]
+name = "planetary-computer"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "clap",
+ "console",
+ "indicatif",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "stac",
+ "tokio",
+ "url",
+]
 
 [[package]]
 name = "proc-macro-error"

@@ -1,10 +1,12 @@
 [package]
-name = "pcdownload"
+name = "planetary-computer"
 version = "0.0.1"
 edition = "2021"
 
 [dependencies]
+anyhow = "1"
 clap = { version = "4", features = ["derive"] }
+console = "0.15"
 indicatif = "0.17"
 reqwest = { version = "0.11", features = ["json", "blocking"] }
 serde = "1"
@@ -12,3 +14,7 @@ serde_json = "1"
 stac = "0.0.4"
 tokio = { version = "1", features = ["full"] }
 url = "2.3"
+
+[[bin]]
+name = "pcdownload"
+path = "src/main.rs"
