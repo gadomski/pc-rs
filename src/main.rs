@@ -2,9 +2,10 @@ use anyhow::{Error, Result};
 use clap::Parser;
 use console::{style, Emoji};
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+use path_slash::PathBufExt;
 use planetary_computer::SasCache;
 use reqwest::Client;
-use stac::Item;
+use stac::{media_type::GEOJSON, Item, Link};
 use std::{collections::HashMap, path::PathBuf};
 use tokio::{fs::File, io::AsyncWriteExt};
 use url::Url;
@@ -48,7 +49,7 @@ async fn main() -> Result<()> {
         SMALL_BLUE_DIAMOND
     );
     let mut item: Item = client
-        .get(item_url)
+        .get(&item_url)
         .send()
         .await?
         .error_for_status()?
@@ -74,6 +75,7 @@ async fn main() -> Result<()> {
     let multi_progress = MultiProgress::new();
     let mut handles = Vec::new();
     std::fs::create_dir_all(&directory)?;
+    let directory = directory.canonicalize()?;
     let num_assets = assets.len();
     for (i, (key, mut asset)) in assets.into_iter().enumerate() {
         let progress_bar = multi_progress.add(ProgressBar::hidden());
@@ -114,6 +116,25 @@ async fn main() -> Result<()> {
             }
         }
     }
+    let href = directory.join(format!("{}.json", item.id));
+    item.links.retain(|link| !link.is_self());
+    item.links.push(Link {
+        href: href.to_slash().unwrap().into_owned(),
+        rel: "self".to_string(),
+        r#type: Some(GEOJSON.to_string()),
+        title: None,
+        additional_fields: Default::default(),
+    });
+    item.links.push(Link {
+        href: item_url,
+        rel: "canonical".to_string(),
+        r#type: Some(GEOJSON.to_string()),
+        title: None,
+        additional_fields: Default::default(),
+    });
+    let item = serde_json::to_vec_pretty(&item)?;
+    let mut file = File::create(href).await?;
+    file.write_all(&item).await?;
 
     Ok(())
 }
