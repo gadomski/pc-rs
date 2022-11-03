@@ -2,6 +2,8 @@
 
 Download all of the assets from a Planetary Computer [STAC](https://stacspec.org/) [Item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md).
 
+![Demo gif](docs/demo.gif)
+
 ## Installation
 
 Install rust, e.g. with [rustup](https://rustup.rs/).
