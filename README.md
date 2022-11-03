@@ -21,7 +21,11 @@ To download the assets to your current working directory:
 pcdownload modis-17A2HGF-061 MYD17A2HGF.A2021361.h34v10.061.2022021015223
 ```
 
-You can use the `--directory` option to specify the output directory.
+To download to a specific directory:
+
+```shell
+pcdownload modis-17A2HGF-061 MYD17A2HGF.A2021361.h34v10.061.2022021015223 data
+```
 
 ## License
 
