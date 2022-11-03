@@ -1,18 +1,19 @@
 use anyhow::{Error, Result};
 use clap::Parser;
 use console::{style, Emoji};
-use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
 use path_slash::PathBufExt;
 use planetary_computer::SasCache;
 use reqwest::Client;
 use stac::{media_type::GEOJSON, Item, Link};
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, time::Instant};
 use tokio::{fs::File, io::AsyncWriteExt};
 use url::Url;
 
 const SMALL_BLUE_DIAMOND: Emoji<'_, '_> = Emoji("🔹 ", "");
 const WRITING_HAND: Emoji<'_, '_> = Emoji("✍️️  ", "");
 const ENVELOPE_WITH_ARROW: Emoji<'_, '_> = Emoji("📩 ", "");
+static SPARKLE: Emoji<'_, '_> = Emoji("✨ ", ":-)");
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -29,6 +30,7 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let started = Instant::now();
     let spinner_style =
         ProgressStyle::with_template("{prefix:.bold.dim} {spinner} [{elapsed}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta}) {wide_msg}")
             .unwrap()
@@ -136,5 +138,6 @@ async fn main() -> Result<()> {
     let mut file = File::create(href).await?;
     file.write_all(&item).await?;
 
+    println!("{} Done in {}", SPARKLE, HumanDuration(started.elapsed()));
     Ok(())
 }
