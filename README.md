@@ -27,6 +27,22 @@ To download to a specific directory:
 pcdownload modis-17A2HGF-061 MYD17A2HGF.A2021361.h34v10.061.2022021015223 data
 ```
 
+Use `--help` to see all options:
+
+```shell
+$ pcdownload --help
+Usage: pcdownload <COLLECTION> <ID> [DIRECTORY]
+
+Arguments:
+  <COLLECTION>  STAC Collection id
+  <ID>          STAC Item id
+  [DIRECTORY]   Output directory. If not provided, use the current working directory
+
+Options:
+  -h, --help     Print help information
+  -V, --version  Print version information
+```
+
 ## License
 
 **pcdownload** is dual-licensed under both the MIT license and the Apache license (Version 2.0).
