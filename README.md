@@ -1,6 +1,6 @@
 # pcdownload
 
-Download all of the assets from a Planetary Computer [STAC](https://stacspec.org/) [Item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md).
+Download all of the assets from a [Planetary Computer](https://planetarycomputer.microsoft.com/) [STAC](https://stacspec.org/) [Item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md).
 
 ![Demo gif](docs/demo.gif)
 
