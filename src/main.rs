@@ -1,5 +1,5 @@
 use anyhow::{Error, Result};
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use console::{style, Emoji};
 use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
 use path_slash::PathBufExt;
@@ -17,28 +17,46 @@ static SPARKLE: Emoji<'_, '_> = Emoji("✨ ", ":-)");
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-struct Args {
-    /// STAC Collection id
-    collection: String,
+struct Cli {
+    #[command(subcommand)]
+    command: Command,
+}
 
-    /// STAC Item id
-    id: String,
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Download assets from a STAC Item.
+    Download {
+        /// STAC Collection id
+        collection: String,
 
-    /// Output directory. If not provided, use the current working directory.
-    directory: Option<PathBuf>,
+        /// STAC Item id
+        id: String,
+
+        /// Output directory. If not provided, use the current working directory.
+        directory: Option<PathBuf>,
+    },
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let cli = Cli::parse();
+    match cli.command {
+        Command::Download {
+            collection,
+            id,
+            directory,
+        } => download(collection, id, directory).await,
+    }
+}
+
+async fn download(collection: String, id: String, directory: Option<PathBuf>) -> Result<()> {
     let started = Instant::now();
     let spinner_style =
         ProgressStyle::with_template("{prefix:.bold.dim} {spinner} [{elapsed}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta}) {wide_msg}")
             .unwrap()
             .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ ");
-    let args = Args::parse();
-    let item_url = planetary_computer::item_url(&args.collection, &args.id);
-    let directory = args
-        .directory
+    let item_url = planetary_computer::item_url(&collection, &id);
+    let directory = directory
         .map(Ok)
         .or_else(|| Some(std::env::current_dir()))
         .transpose()?
