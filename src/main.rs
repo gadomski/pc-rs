@@ -5,7 +5,7 @@ use indicatif::{HumanDuration, MultiProgress, ProgressBar, ProgressStyle};
 use path_slash::PathBufExt;
 use planetary_computer::SasCache;
 use reqwest::Client;
-use stac::{media_type::GEOJSON, Item, Link};
+use stac::{media_type::GEOJSON, Collection, Item, Link};
 use std::{collections::HashMap, path::PathBuf, time::Instant};
 use tokio::{fs::File, io::AsyncWriteExt};
 use url::Url;
@@ -27,13 +27,28 @@ enum Command {
     /// Download assets from a STAC Item.
     Download {
         /// STAC Collection id
-        collection: String,
+        collection_id: String,
 
         /// STAC Item id
-        id: String,
+        item_id: String,
 
         /// Output directory. If not provided, use the current working directory.
         directory: Option<PathBuf>,
+    },
+
+    /// Print a STAC Collection to standard output.
+    Collection {
+        /// STAC Collection id
+        collection_id: String,
+    },
+
+    /// Print a STAC Item to standard output.
+    Item {
+        /// STAC Collection id
+        collection_id: String,
+
+        /// STAC Item id
+        item_id: String,
     },
 }
 
@@ -42,20 +57,29 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     match cli.command {
         Command::Download {
-            collection,
-            id,
+            collection_id,
+            item_id,
             directory,
-        } => download(collection, id, directory).await,
+        } => download(collection_id, item_id, directory).await,
+        Command::Collection { collection_id } => collection(collection_id).await,
+        Command::Item {
+            collection_id,
+            item_id,
+        } => item(collection_id, item_id).await,
     }
 }
 
-async fn download(collection: String, id: String, directory: Option<PathBuf>) -> Result<()> {
+async fn download(
+    collection_id: String,
+    item_id: String,
+    directory: Option<PathBuf>,
+) -> Result<()> {
     let started = Instant::now();
     let spinner_style =
         ProgressStyle::with_template("{prefix:.bold.dim} {spinner} [{elapsed}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta}) {wide_msg}")
             .unwrap()
             .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ ");
-    let item_url = planetary_computer::item_url(&collection, &id);
+    let item_url = planetary_computer::item_url(&collection_id, &item_id);
     let directory = directory
         .map(Ok)
         .or_else(|| Some(std::env::current_dir()))
@@ -157,5 +181,33 @@ async fn download(collection: String, id: String, directory: Option<PathBuf>) ->
     file.write_all(&item).await?;
 
     println!("{} Done in {}", SPARKLE, HumanDuration(started.elapsed()));
+    Ok(())
+}
+
+async fn collection(collection_id: String) -> Result<()> {
+    let collection_url = planetary_computer::collection_url(&collection_id);
+    let client = Client::new();
+    let collection: Collection = client
+        .get(&collection_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    serde_json::to_writer_pretty(std::io::stdout(), &collection)?;
+    Ok(())
+}
+
+async fn item(collection_id: String, item_id: String) -> Result<()> {
+    let item_url = planetary_computer::item_url(&collection_id, &item_id);
+    let client = Client::new();
+    let item: Item = client
+        .get(&item_url)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    serde_json::to_writer_pretty(std::io::stdout(), &item)?;
     Ok(())
 }

@@ -7,8 +7,15 @@ use std::collections::HashMap;
 const API_URL: &str = "https://planetarycomputer.microsoft.com/api/stac/v1";
 const TOKEN_URL: &str = "https://planetarycomputer.microsoft.com/api/sas/v1/token";
 
-pub fn item_url(collection: &str, id: &str) -> String {
-    format!("{}/collections/{}/items/{}", API_URL, collection, id)
+pub fn item_url(collection_id: &str, item_id: &str) -> String {
+    format!(
+        "{}/collections/{}/items/{}",
+        API_URL, collection_id, item_id
+    )
+}
+
+pub fn collection_url(collection_id: &str) -> String {
+    format!("{}/collections/{}", API_URL, collection_id)
 }
 
 pub struct SasCache {
