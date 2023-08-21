@@ -1,5 +1,7 @@
 # pc-rs
 
+**NOTE: This repository has been archived in favor of https://github.com/stac-utils/stac-asset**
+
 Download all of the assets from a [Planetary Computer](https://planetarycomputer.microsoft.com/) [STAC](https://stacspec.org/) [Item](https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md), among other things.
 
 ![Demo gif](docs/demo.gif)
